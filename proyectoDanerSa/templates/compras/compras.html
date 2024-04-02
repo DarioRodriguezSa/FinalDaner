@@ -1,0 +1,109 @@
+<!-- templates/compras/lista_compras.html -->
+{% extends 'pos/base.html' %}
+{% load static %}
+{% block title %}Lista de Compras{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/compras.css' %}">
+
+<div class="custom-card text-center">
+    <h6 class="m-3 "> <i class="fas fa-fw fa-business-time mr-2"></i>Compras</h6>
+</div>
+
+<!-- Agrega el botón para realizar la compra -->
+<div class="text-center mb-3">
+    <a href="{% url 'Apps.compras:realizar_compra_submit' %}" class="btn btn-primary">Realizar Compra</a>
+</div>
+
+<div class="table-container">
+    <div class="row ml-0 mb-3">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table1 table table-bordered table-hovers mx-auto" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Costo de Compra</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for compra in compras %}
+                            <tr>
+                                <td>{{ compra.fecha|date:"d-m-Y" }}</td>
+                                <td>{{ compra.producto.nombre }}</td>
+                                <td>{{ compra.cantidad }}</td>
+                                <td>{{ compra.costo_compra }}</td>
+                                <td>{{ compra.observaciones }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <script>
+
+    $(document).ready(function() {
+        var totalDebts = 0;
+    
+        tblCategories = $('#dataTable').DataTable({
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            },
+            dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row"<"col-sm-12"ip>>',
+            buttons: [],
+            deferRender: true,
+            columnDefs: [
+                {
+                    targets: [0],
+                    type: 'string',
+                    render: function(data, type, row, meta) {
+                        return type === 'display' ? data : moment(data).format('YYYY-MM-DD');
+                    }
+                },
+                {
+                    targets: [-1],
+                    orderable: false,
+                }
+            ],
+            drawCallback: function(settings) {
+                $('#dataTable_paginate .paginate_button').addClass('btn btn-secondary');
+                $('#dataTable_paginate .paginate_button.current').addClass('text-custom-color');
+            },
+            initComplete: function () {
+                // Personaliza el diseño del buscador
+                var input = $('#dataTable_filter input');
+                input.attr('placeholder', 'Buscar...'); // Cambia el texto del marcador de posición
+                input.addClass('form-control'); // Agrega clases de Bootstrap para el estilo
+            }
+        });
+    
+        // Centra el buscador (filtro) en la parte superior de la tabla
+        $('#dataTable_filter').addClass('text-center');
+    });
+    
+    
+
+    
+    </script>
+{% endblock javascripts %}

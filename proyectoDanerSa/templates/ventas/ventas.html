@@ -1,0 +1,230 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Ventas{% endblock title %}
+
+{% block heading %}Ventas{% endblock heading %}
+
+{% block content %}
+<div class="custom-card text-center">
+    <h6 class="m-3 "> <i class="fas fa-fw fa-cart-plus mr-2"></i>Ventas</h6>
+</div>
+<div class="table-container">
+    <a href="{% url 'Apps.ventas:agregar_ventas' %}">
+        <button type="button" class="btn btn-accept  m-2 m-sm-3">
+            <i class="fas fa-plus mr-3"></i>
+            Realizar venta
+        </button>
+    </a>
+</div>
+
+<!-- Tabla de datos -->
+<div class="mb-12">
+    <div class="table-container">
+        <table class="table1 table table-bordered table-hover mx-auto" id="dataTable">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell">ID</th>
+                    <th class="d-none d-sm-table-cell" style="width:5%">#</th>
+                    <th style="width:15%">Cliente</th>
+                    <th style="width:15%">Total</th>
+                    <th class="d-none d-sm-table-cell" style="width:15%">Anticipo</th>
+                    <th style="width:15%">Saldo</th>
+                    <th style="width:15%">Fecha</th>
+                    <th style="width:15%">Fecha de cobro</th>
+                    <th class="text-center" style="width:15%">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in ventas %}
+                <tr>
+                    <td class="d-none d-sm-table-cell">{{v.id}}</td>
+                    <td class="d-none d-sm-table-cell">{{forloop.counter}}</td>
+                    <td>{{v.id_clientes.nombre}}</td>
+                    <td>{{v.total}}</td>
+                    <td class="d-none d-sm-table-cell">{{v.anticipo}}</td>
+                    <td>{{v.getSaldo}}</td>
+                    <td>{{v.fecha}}</td>
+                    <td>{{v.fecha_cobro}}</td>
+                    <td class="text-center">
+                        <a class="text-decoration-none" data-toggle="modal" data-target="#DetalleVentas{{ v.id }}">
+                            <button rel="ver" type="button" class="btn btn-info btn-sm">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </a>
+                        <a class="text-decoration-none" data-toggle="modal" data-target="#UpdateModalVenta{{ v.id }}">
+                            <button rel="update" type="button" class="btn btn-warning btn-sm">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                        </a>
+                        <a class="text-decoration-none">
+                            <button rel="delete" type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                data-target="#exampleModalEliminarVenta{{ v.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </a>
+                    <!-- Modal Eliminar-->
+                    <div class="modal fade" id="exampleModalEliminarVenta{{ v.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Eliminar Venta</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Está seguro de querer Eliminar esta Venta?<br>
+                                    Esta acción no puede deshacerse.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <a href="{% url 'Apps.ventas:eliminar_venta' v.id %}" class="btn btn-danger">Eliminar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                     
+                        <div class="modal fade " id="UpdateModalVenta{{ v.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog row row-font-family">
+                                <div class="modal-content model-update ">
+                                    <div class="modal-header ">
+                                        <h5 class="modal-title " id="exampleModalLabel">Actualizar Venta</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body ">
+                                        <form action="{% url 'Apps.ventas:actualizar_venta' v.id %}" method="post" id="formVentaUpdate">
+                                            {% csrf_token %}
+                                            <div class="form-row">
+                                                <div class="form-group col-md-6">
+                                                    <label for="fecha">Fecha: </label>
+                                                    <input type="date" class="form-control" name="fecha" value="{{ v.fecha|date:'Y-m-d' }}"  required>
+                                                </div>   
+                                                <div class="form-group col-md-6">
+                                                    <label for="fecha_cobro">Fecha de Cobro: </label>
+                                                    <input type="date" class="form-control" name="fecha_cobro" value="{{ v.fecha_cobro|date:'Y-m-d' }}"  required>
+                                                </div>                                              
+                                            </div>
+                                                <p><b>ID:</b>{{ v.id }}</p>
+                                                <p><b>Cliente:</b> {{ v.id_clientes.nombre }}</p>
+                                                <p><b>Total:</b> {{ v.total }}</p>
+                                                <p><b>Anticipo:</b> {{ v.anticipo }}</p>
+                                                <p><b>Saldo:</b> {{ v.getSaldo }}</p>
+                                                <h6><b>Productos Vendidos:</b></h6>
+                                                {% if v.detalleventa_set.all %}
+                                                    <ul>
+                                                        {% for detalle in v.detalleventa_set.all %}
+                                                            <li>{{ detalle.cantidad }} x {{ detalle.id_producto.nombre }} - Precio: {{ detalle.precio }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                {% else %}
+                                                    <p>No hay detalles de productos vendidos.</p>
+                                                {% endif %}
+                                                <div class="form-group col-md-6">
+                                                    <label for="comentario">comentario </label>
+                                                    <input type="text" class="form-control" name="comentario" value="{{v.comentario}}" >
+                                                </div>                                                                                  
+                                            <button type="submit" class="btn btn-accept mx-auto d-block" style=" margin-bottom: 5px;">Actualizar Venta</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>  
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% for v in ventas %}
+<div class="modal fade" id="DetalleVentas{{ v.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Detalles de Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><b>ID:</b>{{ v.id }}</p>
+                <p><b>Cliente:</b> {{ v.id_clientes.nombre }}</p>
+                <p><b>Total:</b> {{ v.total }}</p>
+                <p><b>Anticipo:</b> {{ v.anticipo }}</p>
+                <p><b>Saldo:</b> {{ v.getSaldo }}</p>
+                <p><b>Fecha:</b> {{ v.fecha }}</p>
+                <h6><b>Productos Vendidos:</b></h6>
+                {% if v.detalleventa_set.all %}
+                    <ul>
+                        {% for detalle in v.detalleventa_set.all %}
+                            <li>{{ detalle.cantidad }} x {{ detalle.id_producto.nombre }} - Precio: {{ detalle.precio }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay detalles de productos vendidos.</p>
+                {% endif %}
+                <p><b>Comentario:</b> {{v.comentario}}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock content %}
+
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script>
+$(document).ready(function() {
+    var totalDebts = 0;
+    tblCategories = $('#dataTable').DataTable({
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+        },
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row"<"col-sm-12"ip>>',
+        buttons: [],
+        deferRender: true,
+        columnDefs: [
+            {
+                targets: [0],
+                visible: false,
+                searchable: false,
+            },
+            {
+                targets: [-1], 
+                orderable: false, 
+            }
+        ],
+        drawCallback: function(settings) {
+            $('#dataTable_paginate .paginate_button').addClass('btn btn-secondary');
+            $('#dataTable_paginate .paginate_button.current').addClass('text-custom-color'); 
+        },
+        initComplete: function () {
+                var input = $('#dataTable_filter input');
+                input.attr('placeholder', 'Buscar...');
+                input.addClass('form-control'); 
+            }
+        });
+    
+    $('#dataTable_filter').addClass('text-center');
+});
+</script>
+{% endblock javascripts %}

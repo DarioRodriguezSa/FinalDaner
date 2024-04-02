@@ -1,0 +1,162 @@
+{% extends 'pos/base.html' %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+<div class="table-container">
+<div class="container mt-3">
+    <h2 class="text-center" style="color: #0c5162;">Informe de Ventas</h2>
+
+    <form method="post" action="{% url 'Apps.reportes_generales:index' %}" id="filtro-form">   
+        {% csrf_token %}
+        <div class="form-group">
+            <label style="color: black;" for="fecha">Seleccione una opción:</label>
+            <select class="form-control" name="fecha" id="fecha" onchange="mostrarCampos()">
+                <option value="">Seleccione</option>
+                <option value="dia">Día</option>
+                <option value="rango_fecha">Rango de Fecha</option>
+                <option value="mes">Mes</option>
+            </select>
+        </div>
+
+        <!-- Campos específicos para cada opción -->
+        <div id="campo_dia" class="form-group" style="display: none;">
+            <label style="color: black;" for="fecha_dia">Seleccione el día:</label>
+            <input type="date" class="form-control" name="fecha_dia" id="fecha_dia">
+        </div>
+
+        <div id="campo_rango_fecha" class="form-group" style="display: none;">
+            <label style="color: black;" for="fecha_inicio">Fecha de inicio:</label>
+            <input type="date" class="form-control" name="fecha_inicio" id="fecha_inicio">
+            <label style="color: black;" for="fecha_fin">Fecha de fin:</label>
+            <input type="date" class="form-control" name="fecha_fin" id="fecha_fin">
+        </div>
+
+        <div id="campo_mes" class="form-group" style="display: none;">
+            <label style="color: black;" for="fecha_mes">Seleccione el mes y año:</label>
+            <input type="month" class="form-control" name="fecha_mes" id="fecha_mes">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Generar Informe</button>
+    </form>
+
+    {% if chart_data %}
+    <div class="mt-4">
+        {% if request.method == 'POST' %}
+            {% if opcion == 'dia' %}
+                <p style="color: black;">Reporte basado en el día: {{ fecha_dia }}</p>
+            {% elif opcion == 'rango_fecha' %}
+                <p style="color: black;">Reporte basado en el rango de fechas desde {{ fecha_inicio }} hasta {{ fecha_fin }}</p>
+            {% elif opcion == 'mes' %}
+                <p style="color: black;">Reporte basado en el mes de {{ fecha_mes }}</p>
+            {% endif %}
+        {% endif %}
+
+        <table style="color: black;"  class="table">
+            <thead>
+                <tr>
+                    <th>Nombre del Producto</th>
+                    <th>Cantidad Total del Producto</th>
+                    <th>Cantidad Total Precio Venta</th>
+                    <th>Total de Ganancia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for resultado in chart_data.resultados %}
+                <tr>
+                    <td>{{ resultado.nombre_producto }}</td>
+                    <td>{{ resultado.cantidad_total_producto }}</td>
+                    <td>{{ resultado.cantidad_total_precio_venta }}</td>
+                    <td>{{ resultado.total_ganancia }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+      </div>
+    </div>
+<!-- Gráfico de barras -->
+<canvas id="graficoVentas" width="400" height="200"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  var ctx = document.getElementById('graficoVentas').getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: {{ chart_data.chartjs_data.labels|safe }},
+          datasets: [{
+              label: 'Cantidad Total Precio Venta',
+              data: {{ chart_data.chartjs_data.data.cantidad_total_precio_venta|safe }},
+              backgroundColor: 'rgba(11, 9, 211, 0.2)',
+              borderColor: 'rgba(0, 0, 0, 0.2)',
+              borderWidth: 1
+          }, {
+              label: 'Cantidad Total Producto',
+              data: {{ chart_data.chartjs_data.data.cantidad_total_producto|safe }},
+              backgroundColor: 'rgba(211, 9, 11, 0.2)',
+              borderColor: 'rgba(0, 0, 0, 0.2)',
+              borderWidth: 1
+          }, {
+              label: 'Total Ganancia',
+              data: {{ chart_data.chartjs_data.data.total_ganancia|safe }},
+              backgroundColor: 'rgba(11, 211, 9, 0.2)',
+              borderColor: 'rgba(0, 0, 0, 0.2)',
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  ticks: {
+                      color: 'black'
+                  }
+              },
+              x: {
+                  ticks: {
+                      color: 'black'
+                  }
+              }
+          }
+      }
+  });
+  
+</script>
+
+
+
+    </div>
+    {% else %}
+    <p style="color: black;">{% if request.method == 'POST' %}No hay resultados para mostrar.{% endif %}</p>
+    {% endif %}
+</div>
+
+<script>
+  // Función para mostrar campos
+  function mostrarCampos() {
+      var seleccion = document.getElementById("fecha").value;
+      var campos = ["campo_dia", "campo_rango_fecha", "campo_mes"];
+
+      // Ocultar todos los campos
+      campos.forEach(function(campo) {
+          document.getElementById(campo).style.display = "none";
+      });
+
+      // Mostrar el campo correspondiente a la opción seleccionada
+      if (seleccion) {
+          document.getElementById("campo_" + seleccion).style.display = "block";
+      }
+  }
+
+
+
+
+
+
+</script>
+
+
+  
+
+{% endblock %}

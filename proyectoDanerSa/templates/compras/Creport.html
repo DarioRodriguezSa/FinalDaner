@@ -1,0 +1,238 @@
+{% extends 'pos/base.html' %}
+{% load static %}
+
+{% block title %}Reportes Compras{% endblock %}
+
+{% block content %}
+             
+<br>
+<br>
+<div class="mb-3 text-center" style="border-radius: 20px;">
+    <h3 style="color: #0c5162;">REPORTE DE COMPRAS</h3>
+
+    <div class="form-group" style="border-radius: 8px;" >
+        <label for="fecha_option" style="color: black;">Seleccione una opción</label>
+        <select class="form-control mx-auto" name="fecha_option" style="width: 350px;"  id="fecha_option" onchange="mostrarCamposCompras('campo_dia', 'campo_rango_fecha', 'campo_mes')">
+            <option value="">Seleccione</option>
+            <option value="dia">Día</option>
+            <option value="rango_fecha">Rango de Fecha</option>
+            <option value="mes">Mes</option>
+        </select>
+    </div>
+
+    <div id="campo_dia" class="form-group" style="display: none;">
+        <label for="fecha_dia" style="color: black;">Seleccione el día</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;"  name="fecha_dia" id="fecha_dia">
+    </div>
+
+    <div id="campo_rango_fecha" class="form-group" style="display: none;">
+        <label for="fecha_inicio" style="color: black;">Fecha de inicio</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;" name="fecha_inicio" id="fecha_inicio">
+        <label for="fecha_fin" style="color: black;">Fecha de fin:</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;" name="fecha_fin" id="fecha_fin">
+    </div>
+
+    <div id="campo_mes" class="form-group" style="display:none;">
+        <label for="fecha_mes" style="color: black;">Seleccione el mes </label>
+        <input type="month" class="form-control mx-auto" style="width: 350px;" name="fecha_mes" id="fecha_mes">
+    </div>
+
+    <button type="button" class="btn btn-accept mt-3" onclick="generarReporte()">Generar Reporte Excel</button>
+    <button type="button" class="btn btn-primary mt-3" onclick="generarReportePDF()">Generar Reporte PDF</button>
+    <button type="button" class="btn btn-accept mt-3" onclick="obtenerDatosFiltrados()">Mostrar Datos</button>
+
+    <!-- Agregamos una tabla para mostrar los datos -->
+    <div id="tabla-datos" style="margin-top: 20px; color: black;"></div>
+
+</div>
+
+<
+</div>
+{% endblock %}
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/es.js"></script>
+<script>
+  function mostrarCamposCompras(campoDiaId, campoRangoFechaId, campoMesId) {
+    var fechaOption = document.getElementById('fecha_option').value;
+
+    document.getElementById(campoDiaId).style.display = 'none';
+    document.getElementById(campoRangoFechaId).style.display = 'none';
+    document.getElementById(campoMesId).style.display = 'none';
+
+    if (fechaOption === 'dia') {
+        document.getElementById(campoDiaId).style.display = 'block';
+    } else if (fechaOption === 'rango_fecha') {
+        document.getElementById(campoRangoFechaId).style.display = 'block';
+    } else if (fechaOption === 'mes') {
+        document.getElementById(campoMesId).style.display = 'block';
+    }
+  }
+
+  function generarReporte() {
+    var fechaOption = document.getElementById('fecha_option').value;
+    var start_date, end_date;
+
+    if (fechaOption === 'dia') {
+        start_date = document.getElementById('fecha_dia').value;
+        end_date = start_date; 
+    } else if (fechaOption === 'rango_fecha') {
+        start_date = document.getElementById('fecha_inicio').value;
+        end_date = document.getElementById('fecha_fin').value;
+    } else if (fechaOption === 'mes') {
+        var fechaMes = document.getElementById('fecha_mes').value;
+        
+        if (fechaMes) {
+            start_date = fechaMes + '-01';
+            
+            var ultimoDia = new Date(fechaMes + '-01');
+            ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+            ultimoDia.setDate(ultimoDia.getDate() - 1);
+
+            end_date = ultimoDia.toISOString().split('T')[0];
+        } else {
+            start_date = '';
+            end_date = '';
+        }
+    }
+
+    if (fechaOption && start_date && end_date) {
+        var url = "{% url 'Apps.compras:generar_reporte_excel_compras' '__start_date__' '__end_date__' %}"
+            .replace('__start_date__', start_date)
+            .replace('__end_date__', end_date);
+
+        window.location.href = url;
+    } else {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, Seleccione una opcion',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+    }
+  }
+</script>
+
+<script>
+    function generarReportePDF() {
+      var fechaOption = document.getElementById('fecha_option').value;
+      var start_date, end_date;
+  
+      if (fechaOption === 'dia') {
+          start_date = document.getElementById('fecha_dia').value;
+          end_date = start_date; 
+      } else if (fechaOption === 'rango_fecha') {
+          start_date = document.getElementById('fecha_inicio').value;
+          end_date = document.getElementById('fecha_fin').value;
+      } else if (fechaOption === 'mes') {
+          var fechaMes = document.getElementById('fecha_mes').value;
+          
+          if (fechaMes) {
+              start_date = fechaMes + '-01';
+              
+              var ultimoDia = new Date(fechaMes + '-01');
+              ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+              ultimoDia.setDate(ultimoDia.getDate() - 1);
+  
+              end_date = ultimoDia.toISOString().split('T')[0];
+          } else {
+              start_date = '';
+              end_date = '';
+          }
+      }
+  
+      if (fechaOption && start_date && end_date) {
+          var url = "{% url 'Apps.compras:generar_reporte_pdf_compras' '__start_date__' '__end_date__' %}"
+              .replace('__start_date__', start_date)
+              .replace('__end_date__', end_date);
+  
+          window.location.href = url;
+      } else {
+              Swal.fire({
+                  title: 'Advertencia',
+                  text: 'Por favor, seleccione una opción',
+                  icon: 'warning',
+                  customClass: {
+                      popup: 'my-swal-center',
+                  },
+              });
+      }
+    }
+  </script>
+ <script>
+function mostrarDatosReporte(datos) {
+    var tablaDiv = document.getElementById('tabla-datos');
+
+    var tableHtml = '<table class="table table-bordered" style="color: black;"><thead><tr><th>Fecha</th><th>Producto</th><th>Cantidad</th><th>Costo de Compra</th><th>Observaciones</th></tr></thead><tbody>';
+
+    for (var i = 0; i < datos.length; i++) {
+        tableHtml += '<tr>';
+        tableHtml += '<td>' + datos[i].fecha + '</td>';
+        tableHtml += '<td>' + datos[i].producto + '</td>';
+        tableHtml += '<td>' + datos[i].cantidad + '</td>';
+        tableHtml += '<td>' + datos[i].costo_compra + '</td>';
+        tableHtml += '<td>' + datos[i].observaciones + '</td>';
+        tableHtml += '</tr>';
+    }
+
+    tableHtml += '</tbody></table>';
+
+    tablaDiv.innerHTML = tableHtml;
+}
+
+function obtenerDatosFiltrados() {
+    var fechaOption = document.getElementById('fecha_option').value;
+    var start_date, end_date;
+
+    if (fechaOption === 'dia') {
+        start_date = document.getElementById('fecha_dia').value;
+        end_date = start_date; 
+    } else if (fechaOption === 'rango_fecha') {
+        start_date = document.getElementById('fecha_inicio').value;
+        end_date = document.getElementById('fecha_fin').value;
+    } else if (fechaOption === 'mes') {
+        var fechaMes = document.getElementById('fecha_mes').value;
+        
+        if (fechaMes) {
+            start_date = fechaMes + '-01';
+            
+            var ultimoDia = new Date(fechaMes + '-01');
+            ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+            ultimoDia.setDate(ultimoDia.getDate() - 1);
+
+            end_date = ultimoDia.toISOString().split('T')[0];
+        } else {
+            start_date = '';
+            end_date = '';
+        }
+    }
+
+    if (start_date && end_date) {
+        // Envía una solicitud AJAX al servidor con las fechas seleccionadas
+        var url = "{% url 'Apps.compras:obtener_datos_filtrados_compras' '__start_date__' '__end_date__' %}"
+        .replace('__start_date__', start_date)
+        .replace('__end_date__', end_date);
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                mostrarDatosReporte(response);
+            },
+            error: function(error) {
+                console.error('Error al obtener los datos:', error);
+            }
+        });
+    } else {
+        console.log('Fechas no válidas');
+    }
+}
+
+  </script>
+{% endblock javascripts %}

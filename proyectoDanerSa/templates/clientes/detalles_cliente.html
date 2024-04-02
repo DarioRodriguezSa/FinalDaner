@@ -1,0 +1,322 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Detalles de cliente{% endblock title %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block heading %}Detalles de cliente{% endblock heading %}
+
+{% block content %}
+
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.clientes:lista_clientes' %}">
+        <button type="button" class="btn m-2 m-sm-3 btn-back">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+
+<div class="row row-font-family">
+    <div class="card col-md-8">
+        <div class="card-body">
+                <div class="form-row" id="name_cliente_div" style="text-align: center;">
+                    <div class="form-group col-md-3" style="text-align: center;">
+                        <label id="name_cliente">{{cliente.nombre}}</label>
+                    </div>
+                </div>
+                <div class="form-row" id="informacion_cliente">
+                    <div class="form-group col-md-3">
+                        <label for="inputDescription" style="margin-right: 5px;"> Telefono:</label>
+                        <input type="text" name="telefono" class=" input_cliente" value="{{cliente.telefono}}" readonly>
+                    </div>
+                    <div class="form-group col-md-6" style="display: flex; align-items: self-start;" >
+                        <label for="inputDescription" style="margin-right: 5px;">Direccion:</label>
+                        <textarea name="direccion" class=" input_cliente" rows="1"  readonly>{{cliente.direccion}}</textarea>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="ruta" style="margin-right: 5px;"> Ruta {{cliente.saldoInicial.estado}}:</label>
+                        <input type="text" name="ruta" class=" input_cliente" value="{{cliente.ruta.nombre_ruta}}" readonly>
+                    </div>
+                    <div class="form-group col-md-3 input_saldo">
+                        <label for="inputDescription" style="margin-right: 5px;">Saldo:</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text input_cliente">
+                                    <i class="fab fa-quora quora-icon quora-icon-{{ v.id }}" style="font-size: 20px; color: rgb(197, 6, 6)"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="input_cliente abono-input abono-input-{{ v.id }}" name="saldo" value="{{ cliente.saldo }}" style="color: rgb(197, 6, 6); " required>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 input_saldo">
+                        <div class="input-group">
+                            <a href="#" class="text-decoration-none" data-toggle="modal" data-target="#exampleModalPagar{{ cliente.id }}">
+                                {% if cliente.saldoinicial.estado %}
+                                    <button type="button" class="btn btn-accept">
+                                        Pagar Saldo Inicial
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-accept" disabled>
+                                        Pagar Saldo Inicial
+                                    </button>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                        <div class="modal fade" id="exampleModalPagar{{ cliente.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Pagar Saldo Inicial</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ¿Está seguro de querer saldar el saldo? Esta acción no puede deshacerse.
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        <a href="{% url 'Apps.clientes:saldar_cliente' cliente.id %}" class="btn btn-accept">Pagar</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <div>
+                    <label for="inputDescription" style="margin-right: 5px;">Historial de Ventas:</label>
+                    <div class="table-container">
+                        <table class="table1 table  table-hover mx-auto id_table_detalle" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="d-none d-sm-table-cell">ID</th>
+                                    <th class="d-none d-sm-table-cell" style="width:5%">#</th>
+                                    <th style="width:15%">Total</th>
+                                    <th class="d-none d-sm-table-cell" style="width:15%">Anticipo</th>
+                                    <th style="width:15%">Saldo</th>
+                                    <th style="width:15%">Fecha</th>
+                                    <th class="text-center" style="width:15%">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for v in ventas %}
+                                <tr>
+                                    <td class="d-none d-sm-table-cell">{{v.id}}</td>
+                                    <td class="d-none d-sm-table-cell">{{forloop.counter}}</td>
+                                    <td>{{v.total}}</td>
+                                    <td class="d-none d-sm-table-cell">{{v.anticipo}}</td>
+                                    <td>{{v.getSaldo}}</td>
+                                    <td>{{v.fecha}}</td>
+                                    <td class="text-center">
+                                        <a class="text-decoration-none" data-toggle="modal" data-target="#DetalleVentas-clientes{{ v.id }}">
+                                            <button rel="ver" type="button" class="btn btn-info btn-sm">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </a>
+                                    </td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <label style="margin-right: 5px;">Abonos Saldo Incial:</label>
+                    <div class="table-container">
+                        <table class="table1 table  table-hover mx-auto id_table_detalle" id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th class="width:15%" style="width:5%">#</th>
+                                    <th style="width:15%">Fecha</th>
+                                    <th style="width:15%">Abono</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in abonosSI %}
+                                <tr>
+                                    <td>{{forloop.counter}}</td>
+                                    <td>{{a.fecha}}</td>
+                                    <td>{{a.monto_SI}}</td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+{% for v in ventas %}
+<div class="modal fade" id="DetalleVentas-clientes{{ v.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel-cliente" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+                <h5 class="modal-title" id="exampleModalLabel-cliente">Detalles de Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{% url 'Apps.ventas:agregar_abono' v.id %}"  method="post" id="form-detallecliente">
+                {% csrf_token %}
+            <div class="modal-body">
+                <p><b>Fecha:</b> {{ v.fecha }}</p>
+                <h6><b>Productos Vendidos:</b></h6>
+                {% if v.detalleventa_set.all %}
+                    <ul>
+                        {% for detalle in v.detalleventa_set.all %}
+                            <li>{{ detalle.cantidad }} x {{ detalle.id_producto.nombre }} - Precio: {{ detalle.precio }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay detalles de productos vendidos.</p>
+                {% endif %}
+                <p><b>Comentario:</b> {{v.comentario}}</p>
+                <p><b>Total:</b> {{ v.total }}</p>
+                <p><b>Anticipo:</b> {{ v.anticipo }}</p>
+                <p><b>Saldo:</b> <span id="saldoSpan">{{ v.getSaldo }}</span></p>
+                <hr>
+                {% if v.transacciones_venta.last %}
+                    <p><b>Abonos:</b></p>
+                    <table class="table1 table table-hover mx-auto id_table_detalle">
+                        <thead>
+                            <tr>
+                                <th>Fecha de Abono</th>
+                                <th>Abono</th>
+                                <th>Saldo de Venta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaccion in v.transacciones_venta.all %}
+                                <tr>
+                                    <td>{{ transaccion.fecha }}</td>
+                                    <td>{{ transaccion.abono }}</td>
+                                    <td>{{ transaccion.saldo_venta }}</td>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td><b class="total-abonos">Total Abonos:</b></td>
+                                <td><b class="total-abonos">{{ v.get_suma_abonos }}</b></td>
+                                <td><b class="saldo-actual">Saldo Actual: {{ v.transacciones_venta.last.saldo_venta }}</b></td>
+                            </tr>                            
+                        </tbody>
+                    </table>
+            
+                    <p><b>Pendiente:</b> <span class="pendientes_id">{{ v.transacciones_venta.last.saldo_venta }}</span></p>
+            {% else %}
+                <p><b>Pendientes:</b> <span class="pendientes_id">{{ v.getSaldo }}</span></p>
+                <p><b>Abonos: No existen abonos</b></p>
+            {% endif %}           
+            </div>
+                <div class="form-group col-md-6">
+                        <label for="abono"><strong>Abono:</strong></label>
+                    <div class="contiener-product-fas">
+                        <div class="col-md-2 relleno relleno_detalles" ><i class="fab fa-quora" ></i></div>
+                        <div class="col-md-6 abono_input">
+                            <input type="text" name="abono" class="form-control"  style="background-color: #ccffcc;" required>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-bottom: 3%;">
+                    {% if v.estado_cuenta == True %}
+                        <button type="submit" class="btn btn-accept">Abonar</button>
+                    {% else %}
+                        <label><strong>Venta Cancelada</strong></label>
+                    {% endif %}   
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock content %}
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+<script>
+$(document).ready(function() {
+    
+    $('input[name="abono"]').on('input', function() {
+        validarAbono(this);
+    });
+
+    
+    var quoraIcon = document.querySelector(".quora-icon-{{ v.id }}");
+    var abonoInput = document.querySelector(".abono-input-{{ v.id }}");
+    var saldo = parseFloat("{{ cliente.saldo }}");
+
+    if (saldo === 0) {
+        quoraIcon.style.color = "green";
+        abonoInput.style.color= "green"; // Cambia el fondo del campo de abono
+    } else if (saldo >= 1 && saldo <= 50) {
+        quoraIcon.style.color = "#ffd700";
+        abonoInput.style.color= "#ffd700"; // Cambia el fondo del campo de abono
+    } else {
+        quoraIcon.style.color = "red";
+        abonoInput.style.color= "red"; // Cambia el fondo del campo de abono
+    }
+});
+
+
+function validarAbono(inputElement) {
+    var pendienteId = parseFloat($(inputElement).closest('.modal').find('.pendientes_id').text()) || 0;
+    var abono = parseFloat($(inputElement).closest('.modal').find('input[name="abono"]').val()) || 0;
+
+    if (abono < 0) {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'El abono no puede ser menor o igual a 0',
+            icon: 'warning',
+            customClass: {
+                popup: 'my-swal-center',
+            },
+        });
+        $('input[name="abono"]').val('1');
+    }
+
+    if (abono > pendienteId) {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'El abono no puede ser mayor al saldo pendiente',
+            icon: 'warning',
+            customClass: {
+                popup: 'my-swal-center',
+            },
+        });
+        $('input[name="abono"]').val(pendienteId);
+    }
+}
+
+
+</script>
+<script>
+$(document).ready(function() {
+    
+    document.getElementById('form-detallecliente').addEventListener('submit', function (event) {
+        var saldoInput = document.getElementsByName('abono')[0];
+
+        var saldoValue = parseFloat(saldoInput.value);
+        if (saldoValue <= 0) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'No le es posible efectuar un abono de valor "0"',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            event.preventDefault();
+        }
+    });
+});
+</script>
+{% endblock javascripts %}

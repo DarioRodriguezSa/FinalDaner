@@ -1,0 +1,117 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Agregar cliente{% endblock title %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block heading %}Crear cliente{% endblock heading %}
+
+{% block content %}
+
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.clientes:lista_clientes' %}">
+        <button type="button" class="btn m-2 m-sm-3 btn-back">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+
+<div class="row row-font-family">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.clientes:agregar_cliente' %}"  method="post" id="formcliente">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="nombre" placeholder="Juan..." required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Telefono</label>
+                        <input type="text" name="telefono" class="form-control" placeholder="72752736" pattern="\d{8}" maxlength="8" title="Ingrese exactamente 8 dígitos" required>
+                        <small id="telefonoHelp" class="form-text text-muted">Ingrese un número de teléfono válido (exactamente 8 dígitos).</small>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="inputDescription">Direccion</label>
+                        <textarea name="direccion" class="form-control" placeholder="3ra calle 5-9 san mateo, Quet.." rows="2" required></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="ruta_select">Selecciona una Ruta:</label>
+                        <select name="ruta_select" id="ruta_select" class="form-control">
+                            {% for ruta in rutas %}
+                                <option value="{{ ruta.id }}">{{ ruta.nombre_ruta}} - {{ ruta.descripcion_ruta }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="saldo">Saldo</label>
+                        <input type="number" name="saldo" class="form-control" value="0" required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-accept">Crear cliente</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('formcliente').addEventListener('submit', function (event) {
+    var telefonoInput = document.getElementsByName('telefono')[0];
+    var saldoInput = document.getElementsByName('saldo')[0];
+    var rutaSelect = document.getElementById('ruta_select');
+    
+    if (!/^\d{8}$/.test(telefonoInput.value)) {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'El número de teléfono debe contener exactamente 8 dígitos.',
+            icon: 'warning',
+            customClass: {
+                    popup: 'my-swal-center',
+                },
+        });
+        event.preventDefault();
+    }
+    if (rutaSelect.value === '') {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'Por favor, selecciona una ruta.',
+            icon: 'warning',
+            customClass: {
+                popup: 'my-swal-center',
+            },
+        });
+        event.preventDefault();
+        return;
+    }
+});
+
+$('#formcliente').on('change', 'input[name="saldo"]', function() {
+    var saldoValue = parseFloat(this.value); // Corrección aquí
+    if (isNaN(saldoValue) || saldoValue < 0) {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'Ingrese un saldo válido.',
+            icon: 'warning',
+            customClass: {
+                    popup: 'my-swal-center',
+                },
+        });
+        this.value = 0;
+        event.preventDefault(0);
+    }
+});
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,257 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Clientes{% endblock title %}
+
+
+
+{% block heading %}Clientes{% endblock heading %}
+
+{% block content %}
+<div class="custom-card text-center">
+    <h6 class="m-3 "> <i class="fas fa-users mr-2"></i>Clientes</h6>
+</div>
+<div class="table-container">
+    <div  class="col-sm-12 col-md-6" id="button_length">
+        <a href="{% url 'Apps.clientes:agregar_cliente' %}#formcliente">
+            <button type="button" class="btn btn-accept  m-2 m-sm-3">
+                <i class="fas fa-plus mr-2"></i>
+                Crear nuevo cliente
+            </button>
+        </a>
+    </div>
+</div>
+<!-- Tabla de datos -->
+<div class="mb-12">
+    <div class="table-container ">
+        <div class="form-row dataTable_filter_select">
+            <div class="form-group col-md-2 ">
+                <label for="ruta_select">Selecciona una Ruta:</label>
+                <select name="ruta_select" id="ruta_select" class="form-control">
+                    <option value="" selected>Todas las Rutas</option> <!-- Opción por defecto -->
+                    {% for ruta in rutas %}
+                        <option value="{{ ruta.nombre_ruta}}">{{ ruta.nombre_ruta }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <table class="table1 table table-bordered table-hover mx-auto" id="dataTable">
+            <thead>
+                <tr>
+                    <th class="d-none d-sm-table-cell">ID</th>
+                    <th class="d-none d-sm-table-cell" style="width:5%">#</th>
+                    <th style="width:15%">Nombre</th>
+                    <th class="d-none d-sm-table-cell" style="width:15%">Telefono</th>
+                    <th class="d-none d-sm-table-cell" style="width:25%">Direccion</th>
+                    <th style="width:15%">Saldo</th>
+                    <th style="width:15%">Ruta</th>
+                    <th class="text-center" style="width:15%">Accciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in clientes %}
+                <tr>
+                    <td class="d-none d-sm-table-cell">{{c.id}}</td>
+                    <td class="d-none d-sm-table-cell">{{forloop.counter}}</td>
+                    <td>{{c.nombre}}</td>
+                    <td class="d-none d-sm-table-cell">{{c.telefono}}</td>
+                    <td class="d-none d-sm-table-cell">{{c.direccion}}</td>
+                    <td>{{c.saldo}}</td>
+                    <td>{{c.ruta.nombre_ruta}}</td>
+                    <td class="text-center">
+                    <!--Actualizar-->
+                    <a class="text-decoration-none" data-toggle="modal" data-target="#UpdateModal{{ c.id }}">
+                        <button rel="update" type="button" class="btn btn-warning btn-sm">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                    </a>
+                    <!--Eliminar-->
+                        <a class="text-decoration-none">
+                            <button rel="delete" type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                                data-target="#exampleModal{{ c.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </a>
+                    <!--Ver--> 
+                        <a href="{% url 'Apps.clientes:detalles_clientes' c.id %}" class="text-decoration-none">
+                            <button type="button" class="btn btn-info btn-sm" data-bs-toggle="tooltip"
+                                title="Ver Deuda">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </a>
+                    <!-- Modal Eliminar-->
+                            <div class="modal fade" id="exampleModal{{ c.id }}" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Eliminar cliente</h5>
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div id="updateThisText" class="modal-body">
+                                            ¿Está seguro de que desea eliminar el cliente: {{c.nombre}} ?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <a id="updateThisURL" href="{% url 'Apps.clientes:eliminar_cliente' c.id %}"
+                                                class="text-decoration-none">
+                                                <button type="button" class="btn btn-danger">Eliminar</button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    <!-- Modal Actulizar-->
+                            <div class="modal fade " id="UpdateModal{{ c.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog row row-font-family">
+                                    <div class="modal-content model-update ">
+                                        <div class="modal-header ">
+                                            <h5 class="modal-title " id="exampleModalLabel">Actualizar cliente</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body ">
+                                            <form action="{% url 'Apps.clientes:actualizar_cliente' c.id %}" method="post" id="formclienteupdate">
+                                                {% csrf_token %}
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="inputDescription">Nombre</label>
+                                                        <input type="text" class="form-control" name="nombre" value="{{c.nombre}}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="inputDescription">Telefono</label>
+                                                        <input type="text" name="telefono" class="form-control" value="{{c.telefono}}"" pattern="\d{8}" maxlength="8" title="Ingrese exactamente 8 dígitos" required>
+                                                        <small id="telefonoHelp" class="form-text text-muted">Ingrese un número de teléfono válido (exactamente 8 dígitos).</small>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-12">
+                                                        <label for="inputDescription">Direccion</label>
+                                                        <textarea name="direccion" class="form-control" rows="2" required>{{c.direccion}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="ruta_select">Selecciona una Ruta:</label>
+                                                        <select name="ruta_select" id="ruta_select" class="form-control">
+                                                            {% for ruta in rutas %}
+                                                                <option value="{{ ruta.id }}" {% if c.ruta.id == ruta.id %}selected{% endif %}>
+                                                                    {{ ruta.nombre_ruta }} - {{ ruta.descripcion_ruta }}
+                                                                </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        
+                                                    </div>
+                                                </div>
+                                                                                                                                            
+                                                <button type="submit" class="btn btn-accept mx-auto d-block">Actualizar cliente</button>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+    </div>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="{% static 'vendor/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.colVis.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script>
+$(document).ready(function() {
+    var totalDebts = 0;
+    tblCategories = $('#dataTable').DataTable({
+        language: {
+            "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+        },
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>t<"row"<"col-sm-12"ip>>',
+        buttons: [],
+        deferRender: true,
+        columnDefs: [
+            {
+                targets: [0],
+                visible: false,
+                searchable: false,
+            },
+            {
+                targets: [-1], 
+                orderable: false, 
+            }
+        ],
+        drawCallback: function(settings) {
+            $('#dataTable_paginate .paginate_button').addClass('btn btn-secondary');
+            $('#dataTable_paginate .paginate_button.current').addClass('text-custom-color'); // Cambia el color del texto a #e6a756
+        },
+        initComplete: function () {
+                var input = $('#dataTable_filter input');
+                input.attr('placeholder', 'Buscar...');
+                input.addClass('form-control'); 
+            }
+        });
+        $('#ruta_select').on('change', function () {
+            var rutaId = $(this).val();
+            tblCategories.columns(6).search(rutaId).draw(); // 5 es el índice de la columna 'Ruta'
+        });
+    
+    $('#dataTable_filter').addClass('text-center');
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.getElementById('formclienteupdate').addEventListener('submit', function (event) {
+        var telefonoInput = document.getElementsByName('telefono')[0];
+        var saldoInput = document.getElementsByName('saldo')[0];
+
+        // Reemplazar ',' por '.'
+        saldoInput.value = saldoInput.value.replace(',', '.');
+
+        if (!/^\d{8}$/.test(telefonoInput.value)) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'El número de teléfono debe contener exactamente 8 dígitos.',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            event.preventDefault();
+        }
+
+        var saldoValue = parseFloat(saldoInput.value);
+        if (isNaN(saldoValue) || saldoValue < 0) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Ingrese un saldo válido.',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            event.preventDefault();
+        }
+    });
+</script>
+{% endblock javascripts %}

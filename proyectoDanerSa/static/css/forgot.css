@@ -1,0 +1,42 @@
+#mainNav {
+    display: none;
+}
+label, h1, p, h2 {
+    color: black;
+    text-align: center;
+}
+
+.forgot-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+form{
+    text-align: center;
+}
+
+form input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #003366;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #003366;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+ul{
+    color: black;
+    text-align: left;
+    font-size: 10px;
+}

@@ -1,0 +1,340 @@
+{% extends 'pos/base.html' %}
+{% load static %}
+
+{% block title %}Reportes Abonos Por Cliente{% endblock %}
+
+{% block content %}
+             
+<br>
+<br>
+<div class="mb-3 text-center" style="border-radius: 20px;">
+
+<h3 style="color: #0c5162; " class="mb-3 text-center" >REPORTE ABONOS POR CLIENTE</h3>
+<div class="container" style="width: 350px;" >
+    {% csrf_token %}
+   
+
+    <div class="col-md-6">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label  style="color: black;" >Cliente</label>
+                        <select style="width: 200px;"  class="form-control select2" name="searchbox_clients2" id="searchbox_clients2"></select>
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                    <label  style="width: 200px; color: black;">Cliente Seleccionado:</label>
+                    <input  style="width: 200px; color: black;"  type="text" id="nombreCliente" class="form-control" readonly>
+                </div>
+                <input type="hidden" name="selected_client_id" id="selected_client_id">
+                </div>
+            </div>
+    </div>
+   
+</div>
+
+<div class="mb-3 text-center" style="border-radius: 20px;">
+    <div class="form-group" style="border-radius: 8px;">
+        <label for="fecha_optionn" style="color: black;">Seleccione una opción</label>
+        <select class="form-control mx-auto" name="fecha_option" style="width: 350px;"  id="fecha_optionn" onchange="mostrarCamposClientes('campo_diaa', 'campo_rango_fechaa', 'campo_mess')">
+            <option value="">Seleccione</option>
+            <option value="diaa">Día</option>
+            <option value="rango_fechaa">Rango de Fecha</option>
+            <option value="mess">Mes</option>
+        </select>
+    </div>
+    <div id="campo_diaa" class="form-group" style="display: none;">
+        <label for="fecha_dia" style="color: black;">Seleccione el día</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;" name="fecha_dia" id="fecha_diaa">
+    </div>
+
+    <div id="campo_rango_fechaa" class="form-group" style="display: none;">
+        <label for="fecha_inicio" style="color: black;">Fecha de inicio</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;" name="fecha_inicio" id="fecha_inicioa">
+        <label for="fecha_fin" style="color: black;">Fecha de fin:</label>
+        <input type="date" class="form-control mx-auto" style="width: 350px;" name="fecha_fin" id="fecha_fina">
+    </div>
+
+    <div id="campo_mess" class="form-group" style="display:none;">
+        <label for="fecha_mes" style="color: black;">Seleccione el mes </label>
+        <input type="month" class="form-control mx-auto" style="width: 350px;" name="fecha_mes" id="fecha_mesa">
+    </div>
+    <button type="button" class="btn btn-accept mt-3" onclick="generarReporteCliente()">Generar Reporte Excel Cliente</button>
+    <button type="button" class="btn btn-primary mt-3" onclick="generarReportePDF()">Generar Reporte PDF</button>
+    <button type="button" class="btn btn-accept mt-3" onclick="mostrarDatos()">Mostrar Datos</button>
+
+
+       <div id="tabla-datos" style="margin-top: 20px; color: black;"></div>
+</div>
+
+
+{% endblock %}
+{% block javascripts %}
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/es.js"></script>
+<script>
+
+  function mostrarCamposClientes(campoDiaId, campoRangoFechaId, campoMesId) {
+    var fechaOption = document.getElementById('fecha_optionn').value;
+
+    document.getElementById(campoDiaId).style.display = 'none';
+    document.getElementById(campoRangoFechaId).style.display = 'none';
+    document.getElementById(campoMesId).style.display = 'none';
+
+    if (fechaOption === 'diaa') {
+        document.getElementById(campoDiaId).style.display = 'block';
+    } else if (fechaOption === 'rango_fechaa') {
+        document.getElementById(campoRangoFechaId).style.display = 'block';
+    } else if (fechaOption === 'mess') {
+        document.getElementById(campoMesId).style.display = 'block';
+    }
+  }
+
+
+</script>
+<script>
+    $(document).ready(function() {
+     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+                function csrfSafeMethod(method) {
+                // estos métodos HTTP no requieren protección CSRF
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                }
+        
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+        });
+    
+        function template_product_searchbox(repo) {
+                if (repo.loading) {
+                    return repo.nombre;
+                }
+                var option = $(
+                    '<div class="wrapper container  colorff">'+
+                    ' <div class="row">' +
+                        '<div class="col-lg-11 text-left shadow-sm">' +
+                          //'<br>' +
+                        '<p style="margin-bottom: 5px;">' +
+                        '<b>Nombre:</b> ' + repo.nombre + " | <b>Saldo:</b> " + "<span class='px-2'>" + repo.saldo + '</span> <br>' +
+                        '</p>' +
+                        '</div>' +
+                    '</div>' +
+                    '</div>');
+                return option;
+            }
+        $('#searchbox_clients2').select2({
+            delay: 250,
+            placeholder: 'Buscar cliente',
+            minimumInputLength: 1,
+            allowClear: true,
+            templateResult: template_product_searchbox,
+            ajax:{ 
+                url: "{% url 'Apps.clientes:get_clientes' %}",
+                type: 'POST',
+                data: function (params) {
+                    var queryParameters = {
+                        term: params.term,
+                    }
+                    return queryParameters;
+                },
+                processResults: function (data) {
+                    console.log(data)
+                    return {
+                        results: data
+                    };
+                },
+            }
+        }).on('select2:select', function (e) {
+            var data = e.params.data;
+            // Set selected client ID to the hidden field
+            $('#selected_client_id').val(data.id);
+            $('#nombreCliente').val(data.nombre);
+        });
+    
+    });
+</script>
+<script>
+function generarReporteCliente() {
+        var clienteId = $('#selected_client_id').val();
+        var fechaOption = document.getElementById('fecha_optionn').value;
+        var start_date, end_date;
+
+        if (fechaOption === 'diaa') {
+            start_date = document.getElementById('fecha_diaa').value;
+            end_date = start_date;
+        } else if (fechaOption === 'rango_fechaa') {
+            start_date = document.getElementById('fecha_inicioa').value;
+            end_date = document.getElementById('fecha_fina').value;
+
+            } else if (fechaOption === 'mess') {
+        var fechaMes = document.getElementById('fecha_mesa').value;
+        
+                if (fechaMes) {
+                    start_date = fechaMes + '-01';
+                    
+                    var ultimoDia = new Date(fechaMes + '-01');
+                    ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+                    ultimoDia.setDate(ultimoDia.getDate() - 1);
+
+                    end_date = ultimoDia.toISOString().split('T')[0];
+                } else {
+                    start_date = '';
+                    end_date = '';
+                }
+            }
+
+        if (clienteId && fechaOption && start_date && end_date) {
+            var url = "{% url 'Apps.ventas:generar_reporte_cliente_excel' id_cliente=0 %}".replace(0, clienteId);
+
+            window.location.href = url + '?start_date=' + start_date + '&end_date=' + end_date;
+        } else {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, seleccione una opción',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-centerr',
+                },
+            });
+        }
+    }
+
+
+
+    function generarReportePDF() {
+        var clienteId = $('#selected_client_id').val();
+        var start_date, end_date;
+        var fechaOption = document.getElementById('fecha_optionn').value;
+    
+        if (fechaOption === 'diaa') {
+            start_date = document.getElementById('fecha_diaa').value;
+            end_date = start_date;
+        } else if (fechaOption === 'rango_fechaa') {
+            start_date = document.getElementById('fecha_inicioa').value;
+            end_date = document.getElementById('fecha_fina').value;
+        } else if (fechaOption === 'mess') {
+            var fechaMes = document.getElementById('fecha_mesa').value;
+            
+            if (fechaMes) {
+                start_date = fechaMes + '-01';
+                
+                var ultimoDia = new Date(fechaMes + '-01');
+                ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+                ultimoDia.setDate(ultimoDia.getDate() - 1);
+    
+                end_date = ultimoDia.toISOString().split('T')[0];
+            } else {
+                start_date = '';
+                end_date = '';
+            }
+        }
+    
+        if (clienteId && start_date && end_date) {
+            var url = "/ventas/generar_reporte_cliente_pdf/" + clienteId + "/?start_date=" + start_date + "&end_date=" + end_date;
+            window.location.href = url;
+        } else {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, seleccione un cliente y un rango de fechas',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+        }
+    }
+    
+    
+ 
+    
+
+
+
+
+</script>
+
+<script>
+function mostrarDatos() {
+    var fechaOption = document.getElementById('fecha_optionn').value;
+    var start_date, end_date;
+
+    if (fechaOption === 'diaa') {
+        start_date = document.getElementById('fecha_diaa').value;
+        end_date = start_date;
+    } else if (fechaOption === 'rango_fechaa') {
+        start_date = document.getElementById('fecha_inicioa').value;
+        end_date = document.getElementById('fecha_fina').value;
+    } else if (fechaOption === 'mess') {
+        var fechaMes = document.getElementById('fecha_mesa').value;
+
+        if (fechaMes) {
+            start_date = fechaMes + '-01';
+
+            var ultimoDia = new Date(fechaMes + '-01');
+            ultimoDia.setMonth(ultimoDia.getMonth() + 1);
+            ultimoDia.setDate(ultimoDia.getDate() - 1);
+
+            end_date = ultimoDia.toISOString().split('T')[0];
+        } else {
+            start_date = '';
+            end_date = '';
+        }
+    }
+
+    var clienteId = $('#selected_client_id').val();
+
+    if (clienteId && fechaOption && start_date && end_date) {
+     
+        var url = "/ventas/obtener_datos_abonos_filtrados_id/" + clienteId + "/?start_date=" + start_date + "&end_date=" + end_date;
+      
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                mostrarDatosTabla(response);
+            },
+            error: function(error) {
+                console.error('Error al obtener los datos:', error);
+            }
+        });
+    } else {
+        Swal.fire({
+            title: 'Advertencia',
+            text: 'Por favor, seleccione una opción',
+            icon: 'warning',
+            customClass: {
+                popup: 'my-swal-centerr',
+            },
+        });
+    }
+}
+
+
+function mostrarDatosTabla(datos) {
+    var tablaDiv = document.getElementById('tabla-datos');
+    var tableHtml = '<table class="table table-bordered" style="color: black;"><thead><tr><th>Cliente</th><th>Fecha</th><th>Abono</th><th>Saldo Restante</th><th>Productos Vendidos</th><th>Venta Total</th></tr></thead><tbody>';
+
+    for (var i = 0; i < datos.length; i++) {
+        tableHtml += '<tr>';
+        tableHtml += '<td>' + datos[i].Cliente + '</td>';
+        tableHtml += '<td>' + datos[i].Fecha + '</td>';
+        tableHtml += '<td>' + datos[i].Abono + '</td>';
+        tableHtml += '<td>' + datos[i].SaldoRestante + '</td>';
+        tableHtml += '<td>' + datos[i].ProductosVendidos + '</td>';
+        tableHtml += '<td>' + datos[i].VentaTotal + '</td>';
+        tableHtml += '</tr>';
+    }
+
+    tableHtml += '</tbody></table>';
+    tablaDiv.innerHTML = tableHtml;
+}
+</script>
+{% endblock javascripts %}

@@ -1,0 +1,227 @@
+.btn-back{
+    background-color: #003366;
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+}
+
+
+.row-font-family{
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn-accept{
+    background-color:#1d867c;
+    color: white;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.5rem 0.75rem; 
+    margin: 0; 
+    margin-bottom: 15px;
+    background-color:#0c5162;
+    border-radius: 0.30rem; 
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #03333f; 
+    color: #e6a756;; 
+}
+.text-custom-color {
+    color: #e6a756 !important;
+    margin: 25px;
+}
+#dataTable_filter label {
+    font-size: 0;
+}
+
+#dataTable_filter, #dataTable_length {
+    margin-top: 25px;
+}
+.dataTable_filter_select{
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.dataTable_filter_select select{
+  display: inline-block;
+  margin-bottom: .5rem;
+  max-width: 53vw;
+}
+#button_length{
+    margin-bottom: 15px;
+}
+.modal {
+    contain: content;
+}
+
+
+.model-update {
+    font-family: 'Montserrat', sans-serif;
+    color:#858796;
+    text-align: left;
+}
+
+
+
+.custom-card h6 {
+    color: #000000; 
+    font-size: 1.5rem;
+}
+
+.contiener-product{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    
+}
+.btn-rest{
+    color: rgba(255, 0, 0, 0.37);
+    border-radius: 50%;
+}
+
+.btn-rest:hover{
+    color: rgba(255, 0, 0);
+}
+.contiener-product-trash{
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 5px;
+}
+.contiener-product-first{
+    display: flex;
+    
+}
+
+.contiener-product-second{
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 5px;
+}
+
+.btn-plus{
+    color:#0c5162;
+    border: 2px solid #0c5162;
+    
+}
+
+#saldo_input {
+    border: none;  
+    border-bottom: 1px solid #2b2e31;  
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  
+    background-color: #ffe6e6;
+}
+#div-resumenVenta{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+.div-totales{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.div-totales p{
+    padding: 5px;
+}
+#name_cliente{
+    text-align: center;
+    font-size: 30px;
+    color:#03333f;
+}
+#name_cliente_div{
+    justify-content: center;
+}
+#informacion_cliente{
+    justify-content: space-around;
+}
+.input_cliente{
+        border: none;  /* Elimina el borde predeterminado del input */
+    background-color: #6e707e00;
+    width: 75%;
+    padding: .375rem .75rem;
+    color: #03333f;
+    border-radius: .35rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.input_saldo{
+    display: flex;
+    justify-items: space-around;
+    align-items: flex-start;
+}
+.etiqueta-ventas{
+    font-size: 15px;
+    margin-bottom: 1%;
+}
+
+.relleno_detalles{
+    font-size: 25px; width: 100%;
+}
+.contiener-product-fas{
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 5px;
+}
+.abono_input{
+    min-width: 75%;
+    width: 75%;
+}
+
+.id_table_detalle{
+    color: #03333f;
+}
+
+.total-abonos {
+    color: #03333f;
+}
+
+.saldo-actual {
+    color: #03333f;
+}
+
+.id_table_detalle td{
+    color: gray;
+}
+.select2-container--default .select2-results__option {
+    background-color: #0c5162 !important; /* Reemplaza 'tu_color_de_fondo' con el color deseado */
+}
+#nombreCliente, #saldoCliente{
+    background-color: rgba(238, 238, 238, 0);
+    border: none;
+    font-weight: bold;
+}
+#nombreCliente {
+    text-align: right;
+}
+#div-info-cliente{
+    display: flex;
+}
+
+
+
+@media only screen and (max-width: 600px) {
+    #dataTable_length {
+        margin-top: 0px;
+    }
+    .custom-card {
+        background-color: rgba(255, 252, 252, 0.212); /* Fondo transparente */
+    }
+    .swal2-popup {
+        width: 350px !important;
+        height:360px !important;
+    }
+    .input-group{
+        margin-left: 25px;
+    }
+    .relleno_detalles{
+        font-size: 25px; width: auto;
+    }
+    .abono_input{
+        min-width: 30%;
+        width: 45%;
+        padding-left: 1px;
+    }
+}

@@ -1,0 +1,41 @@
+/* static/css/inventario.css */
+
+.table-container {
+    text-align: center;
+    overflow-x: auto;
+    max-width: 80%; /* Puedes ajustar el porcentaje según tus necesidades */
+    margin: 0 auto; /* Para centrar el contenedor en la pantalla */
+    color: black; /* Quité !important */
+}
+
+.table1 {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100px; /* Ajusta el ancho máximo según sea necesario */
+    color: black; /* Quité !important */
+}
+
+/* Agregar regla para evitar el ajuste automático del texto */
+table th, table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilo para pantallas más pequeñas */
+@media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table th, table td {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    /* Ajusta los estilos según sea necesario para dispositivos móviles */
+    table th, table td {
+        padding: 8px; /* Ajusta el relleno según sea necesario */
+    }
+}

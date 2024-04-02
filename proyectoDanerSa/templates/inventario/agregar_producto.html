@@ -1,0 +1,64 @@
+{% extends "pos/base.html" %}
+
+{% block title %}Agregar producto{% endblock title %}
+
+{% block stylesheets %}
+    <!-- Agrega tus estilos si es necesario -->
+{% endblock stylesheets %}
+
+{% block heading %}Crear producto{% endblock heading %}
+
+{% block content %}
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.inventario:index' %}">
+        <button type="button" class="btn m-2 m-sm-3 btn-back">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+<div class="row row-font-family">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.inventario:agregar_producto' %}" method="post" id="formproducto">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Nombre</label>
+                        <input type="text" class="form-control" name="nombre" placeholder="Nombre del producto..." required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Existencia</label>
+                        <input type="number" name="existencia" class="form-control" placeholder="Cantidad en existencia..." required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Precio Venta</label>
+                        <input type="text" name="precio_venta" class="form-control" placeholder="Precio de venta..." pattern="\d+(\.\d{1,2})?" title="Ingrese un número decimal válido" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Precio Compra</label>
+                        <input type="text" name="precio_compra" class="form-control" placeholder="Precio de compra..." pattern="\d+(\.\d{1,2})?" title="Ingrese un número decimal válido" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="inputDescription">Estado</label>
+                        <select name="estado" class="form-control" required>
+                            <option value="1">Activo</option>
+                            <option value="0">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-accept">Crear producto</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

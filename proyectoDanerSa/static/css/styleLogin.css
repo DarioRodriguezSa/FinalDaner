@@ -1,0 +1,91 @@
+html {
+    height: 100%;
+    background: linear-gradient(to top right, #76d6c6, #1d867c, #0c5162);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Montserrat', sans-serif;
+    color: white;
+}
+
+body {
+    height: 100vh; 
+    margin: 0;
+    -webkit-font-smoothing: antialiased; /* Para navegadores WebKit como Chrome y Safari */
+    
+}
+
+.container {
+    width: 80%; /* Ajusta el ancho según tus necesidades */
+    max-width: 400px; /* Puedes establecer un ancho máximo si lo deseas */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text-center{
+    text-align: center;
+}
+
+.form-group{
+    margin: 20px;
+}
+.my-custom-input {
+    position: relative;
+}
+
+.my-custom-input .icon-container {
+    position: absolute;
+    left: 10px; /* Ajusta la posición del icono según sea necesario */
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.my-custom-input input[type="text"],
+.my-custom-input input[type="password"] {
+    width: calc(100% - 20px); /* Ajusta el ancho del cuadro de texto para tener espacio para el icono */
+    padding-left: 30px; /* Ajusta el espacio a la izquierda del cuadro de texto para dar espacio al icono */
+}
+.user input[type="text"],
+.user input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #003366;
+    border-radius: 20px; 
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.user input[type="password"]::before {
+    content: "\f023"; /* Código del icono Unicode (candado cerrado en Font Awesome) */
+    font-family: "Font Awesome"; /* Asegúrate de tener la fuente Font Awesome cargada */
+    position: absolute;
+    left: 10px; /* Ajusta la posición del icono según sea necesario */
+    top: 50%;
+    transform: translateY(-50%);
+    color: #003366; /* Color del icono */
+    font-size: 16px; /* Tamaño del icono */
+}
+.user button {
+    background: #003366; 
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 60%;
+}
+
+.user button:hover {
+    background-color: #9aa0b3;
+}
+.text-danger{
+    color: #ff0000; /* Rojo intenso para el texto */
+    font-size: 20px;
+}

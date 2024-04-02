@@ -1,0 +1,533 @@
+{% extends "pos/base.html" %}
+{% load static %}
+
+{% block title %}Agregar venta{% endblock title %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block heading %}Realizar ventas{% endblock heading %}
+
+{% block content %}
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.ventas:lista_ventas' %}">
+        <button type="button" class="btn m-2 m-sm-3 btn-back">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+<div class="row row-font-family">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.ventas:agregar_ventas' %}" method="post" id="formventas">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="id_fecha">Fecha</label>
+                        <input type="date" id="id_fecha" name="id_fecha" value="{{ fecha_actual }}" class="form-control">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label >Cliente</label>
+                        <select class="form-control select2" name="searchbox_clients" id="searchbox_clients"></select>
+                    </div>
+                    <div class="form-group col-md-4" >
+                        <label >Cliente Seleccionado:</label>
+                        <div id="div-info-cliente">
+                            <input type="text" id="nombreCliente" class="form-control" readonly>
+                            <input type="text" name="cllienteSaldo" id="saldoCliente" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <input type="hidden" name="cliente"  required/>
+                </div>
+                <hr>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Producto</label>
+                        <div class="contienerPro">
+                            <input type="hidden" name="productos_ids[]" value="" required/>
+                            <input type="hidden" name="productos_cantidades[]" value="" required/>
+                            <input type="hidden" name="productos_precios[]" value="" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button type="button" class="btn btn-plus btnAgregarProducto">Agregar producto</button>
+                </div>
+            <hr>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                            <label for="total">Total Ventas</label>
+                            <div class="contiener-product-second" style="text-align: right;">
+                                <div class="col-md-6 relleno"><i class="fab fa-quora" style="font-size: 25px;"></i></div>
+                                <div class="col-md-6" style="margin-left:5px; margin-right: 7px;">
+                                    <input type="text" name="total" class="form-control" value="0"  style="background-color: #e6f7ff;" readonly>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                            <label for="totalSaldo">Total Ventas + Saldo</label>
+                            <div class="contiener-product-second" style="text-align: right;">
+                                <div class="col-md-6 relleno"><i class="fab fa-quora" style="font-size: 25px;"></i></div>
+                                <div class="col-md-6" style="margin-left:5px; margin-right: 7px;">
+                                    <input type="text" name="totalSaldo" class="form-control" value="0"  style="background-color: #d0eefc;" readonly>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                            <label for="anticipo">Monto</label>
+                            <div class="contiener-product-second" style="text-align: right;">
+                                <div class="col-md-6 relleno"><i class="fab fa-quora" style="font-size: 25px;"></i></div>
+                                <div class="col-md-6" style="margin-left:5px; margin-right: 7px;">
+                                    <input type="text" name="anticipo" class="form-control" value="0"  style="background-color: #ccffcc;" required>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="comentario">Comentario</label>
+                        <textarea name="comentario" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div style="text-align:center;">
+                    <button type="submit" class="btn btn-accept">Crear venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ventaModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}
+{% block javascripts %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var fechaActual = new Date();
+    var year = fechaActual.getFullYear();
+    var month = ('0' + (fechaActual.getMonth() + 1)).slice(-2);  // Agrega un 0 al mes si es menor que 10
+    var day = ('0' + fechaActual.getDate()).slice(-2);  // Agrega un 0 al día si es menor que 10
+    var fechaFormateada = year + '-' + month + '-' + day;
+    document.getElementById("id_fecha").value = fechaFormateada;
+});
+
+  </script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.6.15/dist/sweetalert2.all.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/es.js"></script>
+
+<script>
+    document.getElementById('formventas').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var cliente = $(this).find('input[id="nombreCliente"]').val();
+        var total = $('input[name="total"]').val();
+        var totalSaldo = $('input[name="totalSaldo"]').val();
+        var anticipo = $('input[name="anticipo"]').val();
+        var saldo =totalSaldo-anticipo ;
+
+        var productos = [];
+        $('.contiener-product').each(function() {
+            var producto = {
+                nombre: $(this).find('select[name="producto"]').find('option:selected').text(),
+                cantidad: $(this).find('input[name="cantidad"]').val(),
+                precio: $(this).find('input[name="precio"]').val(),
+            };
+            productos.push(producto);
+        });
+
+        var modalContent = `
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Resumen de la Venta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Cliente:</strong> ${cliente}</p>
+                <p><strong>Productos:</strong></p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        productos.forEach(function(producto) {
+            var subtotal = parseFloat(producto.cantidad) * parseFloat(producto.precio);
+            modalContent += `
+                <tr>
+                    <td>${producto.nombre}</td>
+                    <td>${producto.cantidad}</td>
+                    <td>${producto.precio}</td>
+                    <td>${subtotal}</td>
+                </tr>
+            `;
+        });
+        modalContent += `
+                    </tbody>
+                </table>
+                <div id="div-resumenVenta">
+                    <div class="div-totales">
+                        <p><strong>Total Venta:</strong></p>
+                        <p><strong>Total + Saldo:</strong></p>
+                        <p><strong>Anticipo:</strong></p>
+                        <p><strong>Saldo:</strong></p>
+                    </div>
+                    <div class="div-totales">
+                        <p>${total}</p>
+                        <p>${totalSaldo}</p>
+                        <p>${anticipo}</p>
+                        <p>${saldo}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-accept" id="confirmarVentaBtn">Confirmar Venta</button>
+            </div>
+        `;
+
+        $('#ventaModal .modal-content').html(modalContent);
+        $('#ventaModal').modal('show');
+    });
+
+    $('#ventaModal').on('click', '#confirmarVentaBtn', function() {
+        $('#formventas').submit();
+    });
+</script>
+
+
+<script>
+$(document).ready(function() {
+    $('.btnAgregarProducto').click(function() {
+        var nuevoProducto = $(`
+            <hr>
+            <div class="contiener-product">
+                <div class="contiener-product-trash col-md-12" >
+                    <button rel="delete" type="button" class="btn btn-rest remove-product">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="contiener-product-first col-md-12">
+                    <div class="col-md-6">
+                        <label class="etiqueta-ventas" for="procuducto">Nombre:</label>
+                        <select name="producto" class="form-control" required>
+                            <option selected disabled hidden>Seleccione el producto</option>
+                            {% for p in productos %}
+                            <option value="{{p.idproducto}}" data-precio-venta="{{p.precio_venta}}" data-existencia="{{p.existencia}}" data-precio-compra="{{p.precio_compra}}" requeried>{{p.nombre}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="etiqueta-ventas" for="precio">Precio:</label>
+                        <input type="text" name="precio" class="form-control" value="" required>
+                        <input type="hidden" name="precio_compra" value="" required />
+                        <input type="hidden" name="existencia" value="" required />
+                    </div>
+                </div>
+                <div class="col-md-12 contiener-product-second">
+                    <div class="col-md-6 relleno"></div>
+                    <div class="col-md-6">
+                        <label class="etiqueta-ventas"  for="cantidad">Cantidad:</label>
+                        <input type="number" name="cantidad" class="form-control" min="1" value="1" required>
+                    </div>
+                </div>
+            </div>
+        `);
+        
+        $('.contienerPro').append(nuevoProducto);
+
+
+        function cambiarColor(inputCantidad, existencia) {
+    existencia = parseInt(existencia);
+    if (existencia < 5) {
+        inputCantidad.css('background-color', '#ffe6e6');
+    } else if (existencia >= 5 && existencia < 25) {
+        inputCantidad.css('background-color', '#ffffe6');
+    } else {
+        inputCantidad.css('background-color', '#ccffcc');
+    }
+}
+
+nuevoProducto.find('select[name="producto"]').change(function() {
+    var precioVenta = $(this).find('option:selected').data('precio-venta');
+    $(this).closest('.contiener-product-first').find('input[name="precio"]').val(precioVenta);
+    var existenciaa = $(this).find('option:selected').data('existencia');
+    $(this).closest('.contiener-product-first').find('input[name="existencia"]').val(existenciaa);
+    var precioCompra = $(this).find('option:selected').data('precio-compra');
+    $(this).closest('.contiener-product-first').find('input[name="precio_compra"]').val(precioCompra);
+
+    var inputCantidad = $(this).closest('.contiener-product').find('input[name="cantidad"]');
+    cambiarColor(inputCantidad, existenciaa);
+
+    sumarTotal();
+    actualizarCamposProductos();
+});
+
+
+        nuevoProducto.find('.remove-product').click(function() {
+            nuevoProducto.remove();
+            sumarTotal();
+            actualizarCamposProductos();
+        });
+
+        nuevoProducto.find('input[name="cantidad"]').change(function() {
+            var cantidadInput = $(this);
+            var cantidad = parseFloat(cantidadInput.val());
+            var existencia = parseFloat(cantidadInput.closest('.contiener-product').find('input[name="existencia"]').val());
+
+            if (isNaN(cantidad) || cantidad <= 0) {
+                Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, ingrese un valor mayor a 0',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+                });
+                cantidadInput.val(1);
+            } 
+            else if (cantidad > existencia) {
+                Swal.fire({
+                title: 'Advertencia',
+                text: 'La cantidad seleccionada supera la existencia disponible',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+                cantidadInput.val(existencia);
+            }
+
+            sumarTotal();
+            actualizarCamposProductos();
+        });
+
+        actualizarCamposProductos();
+    });
+
+
+
+    function sumarTotal() {
+        totalVenta = 0;
+        totalVentaSaldo = 0;
+
+        $('.contiener-product').each(function() {
+            var precio = parseFloat($(this).find('input[name="precio"]').val()) || 0;
+            var precio = parseFloat($(this).find('input[name="precio"]').val().replace(',', '.')) || 0;
+            var cantidad = parseFloat($(this).find('input[name="cantidad"]').val()) || 0;
+            var saldoCliente= parseFloat($('input[name=cllienteSaldo]').val())|| 0;;
+            totalVenta += precio * cantidad;
+            totalVentaSaldo = totalVenta + saldoCliente;
+            console.log(saldoCliente);
+            console.log(totalVentaSaldo);
+        });
+
+        $('input[name="total"]').val(totalVenta.toFixed(2));
+        $('input[name="totalSaldo"]').val(totalVentaSaldo.toFixed(2));
+
+
+    }
+
+    $('input[name="anticipo"]').on('input', function() {
+            validarAnticipo();
+
+    });
+
+    function validarAnticipo() {
+        var totalVenta = parseFloat($('input[name="total"]').val()) || 0;
+        var anticipo = parseFloat($('input[name="anticipo"]').val()) || 0;
+        var saldoCliente= parseFloat($('input[name=cllienteSaldo]').val())|| 0;
+        var saldoTotal= saldoCliente + totalVenta;
+
+        if (anticipo < 0) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, ingrese un valor mayor a 0',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+                $('input[name="anticipo"]').val('0');
+        }
+
+        if (isNaN(anticipo)) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, ingrese un valor numérico válido para el anticipo',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            $('input[name="anticipo"]').val('0');
+            }
+        if (anticipo >  saldoTotal) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, verifique el monto, ya que es mayor al Saldo Total.',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+                $('input[name="anticipo"]').val('0');
+        }        
+    }
+
+    $('.contienerPro').on('input', 'input[name="precio"]', function() {
+        var precioInput = $(this);
+        var precio = parseFloat(precioInput.val());
+        if (precio < 1) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'Por favor, ingrese un valor mayor a 0',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            precioInput.val(1);
+        }
+
+
+        sumarTotal();
+        actualizarCamposProductos();
+    });
+
+    $('.contienerPro').on('change', 'input[name="precio"]', function() {
+        var precioInput = $(this);
+        var precio = parseFloat(precioInput.val());
+        var precioCompra = parseFloat(precioInput.closest('.contiener-product').find('input[name="precio_compra"]').val()) || 0 ;
+
+
+        if (  precio < precioCompra ) {
+            Swal.fire({
+                title: 'Advertencia',
+                text: 'El precio venta es mayor al precio compra ',
+                icon: 'warning',
+                customClass: {
+                    popup: 'my-swal-center',
+                },
+            });
+            precioInput.val(precioCompra);
+        }
+
+        sumarTotal();
+        actualizarCamposProductos();
+    });
+
+
+    function actualizarCamposProductos() {
+        var productosIds = [];
+        var productosCantidades = [];
+        var productosPrecios = [];
+
+        $('.contiener-product').each(function () {
+            var id = $(this).find('select[name="producto"]').val();
+            var cantidad = $(this).find('input[name="cantidad"]').val();
+            var precio = $(this).find('input[name="precio"]').val();
+            precio = precio.replace(',', '.');
+            productosIds.push(id);
+            productosCantidades.push(cantidad);
+            productosPrecios.push(precio);
+        });
+        $('input[name="productos_ids[]"]').val(productosIds.join(','));
+        $('input[name="productos_cantidades[]"]').val(productosCantidades.join(','));
+        $('input[name="productos_precios[]"]').val(productosPrecios.join(','));
+    }
+
+    var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            function csrfSafeMethod(method) {
+            // estos métodos HTTP no requieren protección CSRF
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+    
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+    });
+
+    function template_product_searchbox(repo) {
+            if (repo.loading) {
+                return repo.nombre;
+            }
+            var option = $(
+                '<div class="wrapper container  colorff">'+
+                ' <div class="row">' +
+                    '<div class="col-lg-11 text-left shadow-sm">' +
+                      //'<br>' +
+                    '<p style="margin-bottom: 5px;">' +
+                    '<b>Nombre:</b> ' + repo.nombre + " | <b>Saldo:</b> " + "<span class='px-2'>" + repo.saldo + '</span> <br>' +
+                    '</p>' +
+                    '</div>' +
+                '</div>' +
+                '</div>');
+            return option;
+        }
+    $('#searchbox_clients').select2({
+        delay: 250,
+        placeholder: 'Buscar cliente',
+        minimumInputLength: 1,
+        allowClear: true,
+        templateResult: template_product_searchbox,
+        ajax:{ 
+            url: "{% url 'Apps.clientes:get_clientes' %}",
+            type: 'POST',
+            data: function (params) {
+                var queryParameters = {
+                    term: params.term,
+                }
+                return queryParameters;
+            },
+            processResults: function (data) {
+                console.log(data)
+                return {
+                    results: data
+                };
+            },
+        }
+    }).on('select2:select', function (e) {
+        var data = e.params.data;
+        var  saldo = 0;
+        $('input[name="cliente"]').val(data.id);
+        $('#nombreCliente').val(data.nombre +","+ "   Saldo:");
+        $('input[name="cllienteSaldo"]').val(data.saldo);
+        $('#searchbox_clients').val(data.nombre).trigger('change');
+        
+    });
+
+});
+
+</script>
+{% endblock javascripts %}

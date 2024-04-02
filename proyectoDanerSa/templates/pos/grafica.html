@@ -1,0 +1,82 @@
+{% extends 'pos/base.html' %}
+{% load static %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 id="titulo-grafica" style="color: black;">Ventas semanales</h2> <!-- Título dinámico -->
+    <canvas id="grafica"></canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener datos del contexto
+        var productos = {{ productos|safe }};
+        var ventas_totales = {{ ventas_totales|safe }};
+        var inicioSemana = "{{ inicio_semana }}";
+        var finSemana = "{{ fin_semana }}";
+
+        console.log("Productos:", productos);
+        console.log("Ventas totales:", ventas_totales);
+        console.log("Inicio de semana:", inicioSemana);
+        console.log("Fin de semana:", finSemana);
+
+        // Cambiar el formato de las fechas al español
+        var inicioSemanaDate = new Date(inicioSemana);
+        var finSemanaDate = new Date(finSemana);
+        var inicioDiaMes = inicioSemanaDate.getDate();
+        var finDiaMes = finSemanaDate.getDate();
+        var inicioMes = inicioSemanaDate.toLocaleDateString('es-ES', { month: 'long' });
+        var finMes = finSemanaDate.toLocaleDateString('es-ES', { month: 'long' });
+
+        // Cambiar el título de la gráfica con las fechas en español
+        document.getElementById('titulo-grafica').innerText = 'Ventas semanales (Domingo ' + inicioDiaMes + ' de ' + inicioMes + ' de ' + inicioSemanaDate.getFullYear() + ' - Sábado ' + finDiaMes + ' de ' + finMes + ' de ' + finSemanaDate.getFullYear() + ')';
+
+        // Configurar datos para la gráfica de barras
+        var data = {
+            labels: productos,
+            datasets: [{
+                label: 'Ventas totales por producto',
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(0, 0, 0, 0.2)',
+                borderWidth: 1,
+                data: ventas_totales,
+            }]
+        };
+
+        // Configurar opciones de la gráfica
+        var options = {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: 'black'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'black'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'black'
+                    }
+                }
+            }
+        };
+
+        // Crear la instancia de la gráfica
+        var ctx = document.getElementById('grafica').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: options
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "pos/base.html" %}
+{% load static %}
+{% block title %}Agregar ruta{% endblock title %}
+
+{% block stylesheets %}
+{% endblock stylesheets %}
+
+{% block heading %}Crear ruta{% endblock heading %}
+
+{% block content %}
+
+<div class="row ml-0 mb-3">
+    <a href="{% url 'Apps.rutas:lista_rutas' %}">
+        <button type="button" class="btn m-2 m-sm-3 btn-back">
+            <i class="fas fa-long-arrow-alt-left mr-2"></i>
+            Volver
+        </button>
+    </a>
+</div>
+
+
+<div class="row row-font-family">
+    <div class="card col-md-8">
+        <div class="card-body">
+            <form action="{% url 'Apps.rutas:agregar_rutas' %}"  method="post" id="formruta">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" name="nombreRuta" placeholder="Ruta 1" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="descripcion">Descripción</label>
+                        <textarea name="descripcion" class="form-control" placeholder="la ruta es.." rows="2" required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-accept">Crear ruta</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+</script>
+{% endblock javascripts %}

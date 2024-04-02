@@ -1,0 +1,77 @@
+/* static/css/inventario.css */
+
+.table-container {
+    text-align: center;
+    overflow-x: auto;
+    max-width: 80%; /* Puedes ajustar el porcentaje según tus necesidades */
+    margin: 0 auto; /* Para centrar el contenedor en la pantalla */
+    color: black; /* Quité !important */
+}
+
+.table1 {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 100px; /* Ajusta el ancho máximo según sea necesario */
+    color: black; /* Quité !important */
+}
+
+/* Agregar regla para evitar el ajuste automático del texto */
+table th, table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilo para pantallas más pequeñas */
+@media only screen and (max-width: 600px) {
+    table {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table th, table td {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    /* Ajusta los estilos según sea necesario para dispositivos móviles */
+    table th, table td {
+        padding: 8px; /* Ajusta el relleno según sea necesario */
+    }
+}
+
+#dataTable_filter label {
+    font-size: 0; /* Oculta el texto estableciendo el tamaño de fuente a cero */
+}
+
+#dataTable_filter label::before {
+    content: ""; /* Restaura el texto antes del campo de búsqueda */
+    font-size: 14px; /* Ajusta el tamaño de la fuente según sea necesario */
+}
+
+
+h2 {
+    color: black;
+}
+
+
+
+/* static/css/inventario.css */
+
+/* Estilo para el mensaje de éxito */
+.messages.success {
+    list-style: none;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: #dff0d8; /* Fondo verde claro */
+    color: #3c763d; /* Texto verde oscuro */
+    border: 1px solid #d6e9c6; /* Borde verde claro */
+}
+
+/* Estilo para el mensaje de éxito importante */
+.messages.success.important {
+    background-color: #5bc0de !important; /* Fondo azul medio con !important */
+    color: #31708f !important; /* Texto azul oscuro con !important */
+    border: 1px solid #46b8da !important; /* Borde azul claro con !important */
+}
